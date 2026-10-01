@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Afiliado</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4f3f0;
+            --surface: #fcfcfb;
+            --surface-2: #f0efec;
+            --border: #e2e0da;
+            --text: #0b0b0b;
+            --text-2: #52514e;
+            --muted: #85847f;
+            --accent: #2a78d6;
+            --accent-ink: #ffffff;
+            --series-1: #2a78d6;
+            --series-2: #eb6834;
+            --good: #0f7a3a;
+            --good-bg: #e3f4e8;
+            --warn: #8a5a00;
+            --warn-bg: #fdf1d6;
+            --bad: #b42323;
+            --bad-bg: #fbe4e3;
+            --info: #1c5cab;
+            --info-bg: #e1ecfa;
+            --neutral-bg: #ebeae6;
+            --grid: #e6e4de;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                color-scheme: dark;
+                --bg: #121211;
+                --surface: #1a1a19;
+                --surface-2: #232321;
+                --border: #33332f;
+                --text: #ffffff;
+                --text-2: #c3c2b7;
+                --muted: #8f8e86;
+                --accent: #3987e5;
+                --series-1: #3987e5;
+                --series-2: #d95926;
+                --good: #5fd08a;
+                --good-bg: #173322;
+                --warn: #f0c060;
+                --warn-bg: #3a2e12;
+                --bad: #f28b8b;
+                --bad-bg: #3d1a1a;
+                --info: #86b6ef;
+                --info-bg: #182a40;
+                --neutral-bg: #2c2c29;
+                --grid: #2c2c29;
+            }
+        }
+
+        :root[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #121211;
+            --surface: #1a1a19;
+            --surface-2: #232321;
+            --border: #33332f;
+            --text: #ffffff;
+            --text-2: #c3c2b7;
+            --muted: #8f8e86;
+            --accent: #3987e5;
+            --series-1: #3987e5;
+            --series-2: #d95926;
+            --good: #5fd08a;
+            --good-bg: #173322;
+            --warn: #f0c060;
+            --warn-bg: #3a2e12;
+            --bad: #f28b8b;
+            --bad-bg: #3d1a1a;
+            --info: #86b6ef;
+            --info-bg: #182a40;
+            --neutral-bg: #2c2c29;
+            --grid: #2c2c29;
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        header.top {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header.top h1 { font-size: 18px; margin: 0; }
+        header.top p { margin: 2px 0 0; color: var(--text-2); font-size: 13px; }
+
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+        nav.tabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        nav.tabs button {
+            background: none;
+            border: 0;
+            border-bottom: 2px solid transparent;
+            padding: 10px 14px;
+            color: var(--text-2);
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        nav.tabs button.active { color: var(--text); border-bottom-color: var(--accent); }
+
+        .tab { display: none; }
+        .tab.active { display: block; }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card h2 { font-size: 15px; margin: 0 0 12px; }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .kpi {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .kpi .label { color: var(--text-2); font-size: 12px; }
+        .kpi .value { font-size: 22px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+        .kpi .sub { color: var(--muted); font-size: 12px; }
+
+        label.f { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-2); }
+
+        input, select, textarea {
+            font: inherit;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 9px;
+            min-width: 0;
+        }
+
+        textarea { resize: vertical; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
+        }
+
+        .form-grid .wide { grid-column: 1 / -1; }
+
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+        button.btn {
+            font: inherit;
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+        button.btn.small { padding: 4px 9px; font-size: 12px; }
+        button.btn.danger { color: var(--bad); }
+
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+        th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { color: var(--text-2); font-size: 12px; font-weight: 600; background: var(--surface-2); }
+        td.num, th.num { text-align: right; }
+        tr:last-child td { border-bottom: 0; }
+        tfoot td { font-weight: 700; background: var(--surface-2); }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tag.good { color: var(--good); background: var(--good-bg); }
+        .tag.warn { color: var(--warn); background: var(--warn-bg); }
+        .tag.bad { color: var(--bad); background: var(--bad-bg); }
+        .tag.info { color: var(--info); background: var(--info-bg); }
+        .tag.neutral { color: var(--text-2); background: var(--neutral-bg); }
+
+        .pos { color: var(--good); }
+        .neg { color: var(--bad); }
+
+        .empty { color: var(--muted); padding: 18px; text-align: center; }
+
+        .chart-box { position: relative; }
+        .chart-box svg { display: block; width: 100%; height: 260px; }
+        .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin-bottom: 8px; }
+        .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+        .tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+            display: none;
+            min-width: 150px;
+            z-index: 5;
+        }
+
+        .tooltip b { display: block; margin-bottom: 4px; }
+        .tooltip .row { display: flex; justify-content: space-between; gap: 12px; }
+
+        .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+        .toast {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: var(--bg);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+            z-index: 20;
+        }
+
+        @media (max-width: 600px) {
+            .kpi .value { font-size: 19px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="top">
+        <div>
+            <h1>Painel de Afiliado · Google Ads</h1>
+            <p>Produtos em teste, investimento, vendas e lucro num só lugar.</p>
+        </div>
+        <div class="actions" style="margin:0">
+            <button class="btn small" id="btnTheme" type="button">Tema</button>
+            <button class="btn small" id="btnExport" type="button">Backup (JSON)</button>
+            <button class="btn small" id="btnImport" type="button">Restaurar backup</button>
+            <input type="file" id="fileImport" accept="application/json" hidden>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <nav class="tabs">
+            <button class="active" data-tab="geral">Visão geral</button>
+            <button data-tab="produtos">Produtos</button>
+            <button data-tab="gastos">Gastos Google Ads</button>
+            <button data-tab="vendas">Vendas</button>
+        </nav>
+
+        <!-- VISÃO GERAL -->
+        <section class="tab active" id="tab-geral">
+            <div class="filters">
+                <label class="f">Período
+                    <select id="fPeriodo">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30" selected>Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="mes">Este mês</option>
+                        <option value="all">Tudo</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </label>
+                <label class="f custom-range" hidden>De <input type="date" id="fDe"></label>
+                <label class="f custom-range" hidden>Até <input type="date" id="fAte"></label>
+                <label class="f">Produto
+                    <select id="fProduto"></select>
+                </label>
+            </div>
+
+            <div class="kpis" id="kpis"></div>
+
+            <div class="card">
+                <h2>Investimento × Comissão por dia</h2>
+                <div class="legend">
+                    <span><i style="background:var(--series-1)"></i>Investimento (Google Ads)</span>
+                    <span><i style="background:var(--series-2)"></i>Comissão recebida</span>
+                </div>
+                <div class="chart-box" id="chartBox">
+                    <svg id="chart" role="img" aria-label="Gráfico diário de investimento e comissão"></svg>
+                    <div class="tooltip" id="tooltip"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Desempenho por produto</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Status</th>
+                                <th class="num">Investido</th>
+                                <th class="num">Cliques</th>
+                                <th class="num">CTR</th>
+                                <th class="num">CPC</th>
+                                <th class="num">Vendas</th>
+                                <th class="num">Comissão</th>
+                                <th class="num">Lucro</th>
+                                <th class="num">ROI</th>
+                                <th class="num">CPA</th>
+                                <th>Leitura</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbResumo"></tbody>
+                        <tfoot id="tfResumo"></tfoot>
+                    </table>
+                </div>
+                <p class="hint">Leitura automática: sem venda e gasto acima de 1× a comissão = atenção; acima de 2× = pensar em pausar. Lucro positivo = escalar com cuidado.</p>
+            </div>
+        </section>
+
+        <!-- PRODUTOS -->
+        <section class="tab" id="tab-produtos">
+            <div class="card">
+                <h2 id="pTitulo">Cadastrar produto</h2>
+                <form id="formProduto">
+                    <input type="hidden" name="id">
+                    <div class="form-grid">
+                        <label class="f">Nome do produto *<input name="nome" required></label>
+                        <label class="f">Plataforma
+                            <select name="plataforma">
+                                <option>Hotmart</option>
+                                <option>Kiwify</option>
+                                <option>Eduzz</option>
+                                <option>Monetizze</option>
+                                <option>Braip</option>
+                                <option>ClickBank</option>
+                                <option>Digistore24</option>
+                                <option>BuyGoods</option>
+                                <option>Outra</option>
+                            </select>
+                        </label>
+                        <label class="f">Nicho<input name="nicho" placeholder="ex: emagrecimento"></label>
+                        <label class="f">Preço do produto (R$)<input name="preco" type="number" step="0.01" min="0"></label>
+                        <label class="f">Comissão por venda (R$)<input name="comissao" type="number" step="0.01" min="0"></label>
+                        <label class="f">Status
+                            <select name="status">
+                                <option>Em teste</option>
+                                <option>Validado</option>
+                                <option>Escalando</option>
+                                <option>Pausado</option>
+                                <option>Reprovado</option>
+                            </select>
+                        </label>
+                        <label class="f">Início do teste<input name="inicio" type="date"></label>
+                        <label class="f">Orçamento de teste (R$)<input name="orcamento" type="number" step="0.01" min="0"></label>
+                        <label class="f wide">Link de afiliado<input name="link" type="url" placeholder="https://..."></label>
+                        <label class="f wide">Anotações (palavras-chave, criativos, aprendizados)<textarea name="notas" rows="2"></textarea></label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn primary" type="submit">Salvar produto</button>
+                        <button class="btn" type="button" id="pCancelar" hidden>Cancelar edição</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Meus produtos</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Plataforma</th>
+                                <th>Nicho</th>
+                                <th>Status</th>
+                                <th class="num">Comissão</th>
+                                <th class="num">Orçamento teste</th>
+                                <th class="num">Já investido</th>
+                                <th>Início</th>
+                                <th>Link</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbProdutos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- GASTOS -->
+        <section class="tab" id="tab-gastos">
+            <div class="card">
+                <h2 id="gTitulo">Lançar gasto do Google Ads</h2>
+                <form id="formGasto">
+                    <input type="hidden" name="id">
+                    <div class="form-grid">
+                        <label class="f">Data *<input name="data" type="date" required></label>
+                        <label class="f">Produto *<select name="produtoId" required></select></label>
+                        <label class="f">Campanha<input name="campanha" placeholder="ex: Pesquisa - fundo de funil"></label>
+                        <label class="f">Valor gasto (R$) *<input name="gasto" type="number" step="0.01" min="0" required></label>
+                        <label class="f">Impressões<input name="impressoes" type="number" min="0"></label>
+                        <label class="f">Cliques<input name="cliques" type="number" min="0"></label>
+                        <label class="f">Conversões (Ads)<input name="conversoes" type="number" min="0" step="any"></label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn primary" type="submit">Salvar gasto</button>
+                        <button class="btn" type="button" id="gCancelar" hidden>Cancelar edição</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Histórico de gastos</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Produto</th>
+                                <th>Campanha</th>
+                                <th class="num">Gasto</th>
+                                <th class="num">Impressões</th>
+                                <th class="num">Cliques</th>
+                                <th class="num">CTR</th>
+                                <th class="num">CPC</th>
+                                <th class="num">Conv. Ads</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbGastos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VENDAS -->
+        <section class="tab" id="tab-vendas">
+            <div class="card">
+                <h2 id="vTitulo">Registrar venda</h2>
+                <form id="formVenda">
+                    <input type="hidden" name="id">
+                    <div class="form-grid">
+                        <label class="f">Data *<input name="data" type="date" required></label>
+                        <label class="f">Produto *<select name="produtoId" required></select></label>
+                        <label class="f">Comissão (R$) *<input name="valor" type="number" step="0.01" min="0" required></label>
+                        <label class="f">Status
+                            <select name="status">
+                                <option>Aprovada</option>
+                                <option>Pendente</option>
+                                <option>Reembolsada</option>
+                                <option>Chargeback</option>
+                            </select>
+                        </label>
+                        <label class="f">Campanha / origem<input name="origem" placeholder="ex: Pesquisa - marca"></label>
+                        <label class="f">Código da transação<input name="transacao"></label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn primary" type="submit">Salvar venda</button>
+                        <button class="btn" type="button" id="vCancelar" hidden>Cancelar edição</button>
+                        <button class="btn" type="button" id="btnCsv">Exportar vendas (CSV)</button>
+                    </div>
+                    <p class="hint">Ao escolher o produto, a comissão é preenchida com o valor cadastrado. Só vendas "Aprovada" entram no lucro; "Pendente" aparece à parte.</p>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Histórico de vendas</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Produto</th>
+                                <th class="num">Comissão</th>
+                                <th>Status</th>
+                                <th>Origem</th>
+                                <th>Transação</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbVendas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const KEY = 'painel-afiliado-v1';
+        const $ = (s, el = document) => el.querySelector(s);
+        const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+        // ---------- Dados ----------
+        function load() {
+            try {
+                const d = JSON.parse(localStorage.getItem(KEY));
+                if (d && d.produtos) return { produtos: d.produtos || [], gastos: d.gastos || [], vendas: d.vendas || [] };
+            } catch (e) { }
+            return { produtos: [], gastos: [], vendas: [] };
+        }
+        let db = load();
+        function save() {
+            try { localStorage.setItem(KEY, JSON.stringify(db)); }
+            catch (e) { toast('Não foi possível salvar no navegador. Faça um backup!'); }
+        }
+        const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+        // ---------- Formatação ----------
+        const brl = v => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const int = v => (v || 0).toLocaleString('pt-BR');
+        const pct = v => isFinite(v) ? (v * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : '—';
+        const num = v => parseFloat(v) || 0;
+        const fmtData = s => s ? s.split('-').reverse().join('/') : '';
+        const isoLocal = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const hoje = () => isoLocal(new Date());
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const sinal = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+        const nomeProduto = id => (db.produtos.find(p => p.id === id) || {}).nome || '(produto removido)';
+
+        function toast(msg) {
+            const t = $('#toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => t.style.display = 'none', 2200);
+        }
+
+        const statusProdTag = {
+            'Em teste': 'info', 'Validado': 'good', 'Escalando': 'good', 'Pausado': 'neutral', 'Reprovado': 'bad'
+        };
+        const statusVendaTag = { 'Aprovada': 'good', 'Pendente': 'warn', 'Reembolsada': 'bad', 'Chargeback': 'bad' };
+
+        // ---------- Abas ----------
+        $$('nav.tabs button').forEach(b => b.addEventListener('click', () => {
+            $$('nav.tabs button').forEach(x => x.classList.toggle('active', x === b));
+            $$('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + b.dataset.tab));
+            try { localStorage.setItem(KEY + '-tab', b.dataset.tab); } catch (e) { }
+            if (b.dataset.tab === 'geral') renderGeral();
+        }));
+
+        // ---------- Tema ----------
+        $('#btnTheme').addEventListener('click', () => {
+            const cur = document.documentElement.dataset.theme
+                || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = next;
+            try { localStorage.setItem(KEY + '-theme', next); } catch (e) { }
+            renderGeral();
+        });
+        try {
+            const th = localStorage.getItem(KEY + '-theme');
+            if (th) document.documentElement.dataset.theme = th;
+        } catch (e) { }
+
+        // ---------- Selects de produto ----------
+        function fillProdutoSelects() {
+            const opts = db.produtos.map(p => `<option value="${p.id}">${esc(p.nome)}</option>`).join('');
+            $$('select[name="produtoId"]').forEach(s => {
+                const v = s.value;
+                s.innerHTML = db.produtos.length ? opts : '<option value="">Cadastre um produto primeiro</option>';
+                if (v) s.value = v;
+            });
+            const f = $('#fProduto'), fv = f.value;
+            f.innerHTML = '<option value="">Todos</option>' + opts;
+            f.value = fv;
+            if (!$('#formVenda').elements.valor.value) autoComissao();
+        }
+
+        // ---------- Formulários genéricos ----------
+        function formData(form) {
+            const o = {};
+            new FormData(form).forEach((v, k) => o[k] = v);
+            return o;
+        }
+        function fillForm(form, obj) {
+            Object.entries(obj).forEach(([k, v]) => { if (form.elements[k]) form.elements[k].value = v ?? ''; });
+        }
+        function setupForm({ form, list, titulo, tituloNovo, tituloEditar, cancelar, parse, onReset }) {
+            const reset = () => {
+                form.reset();
+                form.elements.id.value = '';
+                $(titulo).textContent = tituloNovo;
+                $(cancelar).hidden = true;
+                onReset && onReset();
+            };
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                const o = parse(formData(form));
+                if (!o) return;
+                const arr = db[list];
+                if (o.id) {
+                    const i = arr.findIndex(x => x.id === o.id);
+                    if (i >= 0) arr[i] = o;
+                    toast('Atualizado!');
+                } else {
+                    o.id = uid();
+                    arr.push(o);
+                    toast('Salvo!');
+                }
+                save();
+                reset();
+                renderAll();
+            });
+            $(cancelar).addEventListener('click', reset);
+            return {
+                reset,
+                edit(id) {
+                    const o = db[list].find(x => x.id === id);
+                    if (!o) return;
+                    fillForm(form, o);
+                    $(titulo).textContent = tituloEditar;
+                    $(cancelar).hidden = false;
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            };
+        }
+
+        const fProduto = setupForm({
+            form: $('#formProduto'), list: 'produtos', titulo: '#pTitulo', cancelar: '#pCancelar',
+            tituloNovo: 'Cadastrar produto', tituloEditar: 'Editar produto',
+            parse: o => ({ ...o, preco: num(o.preco), comissao: num(o.comissao), orcamento: num(o.orcamento) }),
+            onReset: () => { $('#formProduto').elements.inicio.value = hoje(); }
+        });
+
+        const needProduto = o => {
+            if (!o.produtoId) { toast('Cadastre um produto primeiro.'); return false; }
+            return true;
+        };
+
+        const fGasto = setupForm({
+            form: $('#formGasto'), list: 'gastos', titulo: '#gTitulo', cancelar: '#gCancelar',
+            tituloNovo: 'Lançar gasto do Google Ads', tituloEditar: 'Editar gasto',
+            parse: o => needProduto(o) && ({
+                ...o, gasto: num(o.gasto), impressoes: num(o.impressoes), cliques: num(o.cliques), conversoes: num(o.conversoes)
+            }),
+            onReset: () => { $('#formGasto').elements.data.value = hoje(); }
+        });
+
+        const fVenda = setupForm({
+            form: $('#formVenda'), list: 'vendas', titulo: '#vTitulo', cancelar: '#vCancelar',
+            tituloNovo: 'Registrar venda', tituloEditar: 'Editar venda',
+            parse: o => needProduto(o) && ({ ...o, valor: num(o.valor) }),
+            onReset: () => {
+                const f = $('#formVenda');
+                f.elements.data.value = hoje();
+                autoComissao();
+            }
+        });
+
+        function autoComissao() {
+            const f = $('#formVenda');
+            const p = db.produtos.find(x => x.id === f.elements.produtoId.value);
+            if (p && p.comissao && !f.elements.id.value) f.elements.valor.value = p.comissao;
+        }
+        $('#formVenda').elements.produtoId.addEventListener('change', autoComissao);
+
+        // Ações nas tabelas (editar / excluir)
+        document.addEventListener('click', e => {
+            const b = e.target.closest('[data-act]');
+            if (!b) return;
+            const { act, list, id } = b.dataset;
+            if (!list) return;
+            if (act === 'edit') ({ produtos: fProduto, gastos: fGasto, vendas: fVenda })[list].edit(id);
+            if (act === 'del') {
+                let msg = 'Excluir este registro?';
+                if (list === 'produtos') {
+                    const n = db.gastos.filter(g => g.produtoId === id).length + db.vendas.filter(v => v.produtoId === id).length;
+                    if (n) msg = `Excluir este produto? Ele tem ${n} lançamento(s) de gasto/venda, que também serão excluídos.`;
+                }
+                if (!confirm(msg)) return;
+                db[list] = db[list].filter(x => x.id !== id);
+                if (list === 'produtos') {
+                    db.gastos = db.gastos.filter(g => g.produtoId !== id);
+                    db.vendas = db.vendas.filter(v => v.produtoId !== id);
+                }
+                save();
+                renderAll();
+                toast('Excluído.');
+            }
+        });
+
+        const botoes = (list, id) =>
+            `<td><button class="btn small" data-act="edit" data-list="${list}" data-id="${id}">Editar</button>
+             <button class="btn small danger" data-act="del" data-list="${list}" data-id="${id}">Excluir</button></td>`;
+
+        // ---------- Filtro de período ----------
+        function intervalo() {
+            const p = $('#fPeriodo').value;
+            const d = new Date();
+            const iso = isoLocal;
+            if (p === 'all') return ['0000-01-01', '9999-12-31'];
+            if (p === 'custom') return [$('#fDe').value || '0000-01-01', $('#fAte').value || '9999-12-31'];
+            if (p === 'mes') return [iso(new Date(d.getFullYear(), d.getMonth(), 1, 12)), hoje()];
+            const ini = new Date(d);
+            ini.setDate(d.getDate() - (parseInt(p) - 1));
+            return [iso(ini), hoje()];
+        }
+        $('#fPeriodo').addEventListener('change', () => {
+            $$('.custom-range').forEach(el => el.hidden = $('#fPeriodo').value !== 'custom');
+            renderGeral();
+        });
+        ['#fDe', '#fAte', '#fProduto'].forEach(s => $(s).addEventListener('change', renderGeral));
+
+        // ---------- Métricas ----------
+        function metricas(gastos, vendas) {
+            const m = {
+                gasto: 0, impressoes: 0, cliques: 0, vendas: 0, receita: 0, pendente: 0, nPendente: 0, reembolsos: 0
+            };
+            gastos.forEach(g => { m.gasto += g.gasto; m.impressoes += g.impressoes; m.cliques += g.cliques; });
+            vendas.forEach(v => {
+                if (v.status === 'Aprovada') { m.vendas++; m.receita += v.valor; }
+                else if (v.status === 'Pendente') { m.nPendente++; m.pendente += v.valor; }
+                else m.reembolsos++;
+            });
+            m.lucro = m.receita - m.gasto;
+            m.roi = m.gasto ? m.lucro / m.gasto : NaN;
+            m.roas = m.gasto ? m.receita / m.gasto : NaN;
+            m.cpa = m.vendas ? m.gasto / m.vendas : NaN;
+            m.ctr = m.impressoes ? m.cliques / m.impressoes : NaN;
+            m.cpc = m.cliques ? m.gasto / m.cliques : NaN;
+            m.conv = m.cliques ? m.vendas / m.cliques : NaN;
+            return m;
+        }
+
+        function leitura(m, p) {
+            const com = p.comissao || 0;
+            if (m.gasto === 0 && m.vendas === 0) return '<span class="tag neutral">Sem dados</span>';
+            if (m.vendas === 0) {
+                if (com && m.gasto >= 2 * com) return '<span class="tag bad">✕ Sem venda — pausar?</span>';
+                if (com && m.gasto >= com) return '<span class="tag warn">! Atenção</span>';
+                return '<span class="tag info">… Coletando dados</span>';
+            }
+            if (m.lucro > 0) return '<span class="tag good">✓ Lucrativo</span>';
+            if (m.roas >= 0.7) return '<span class="tag warn">! Quase no 0 a 0 — otimizar</span>';
+            return '<span class="tag bad">✕ Prejuízo</span>';
+        }
+
+        // ---------- Render: Visão geral ----------
+        function renderGeral() {
+            const [de, ate] = intervalo();
+            const pid = $('#fProduto').value;
+            const inP = x => x.data >= de && x.data <= ate && (!pid || x.produtoId === pid);
+            const gastos = db.gastos.filter(inP);
+            const vendas = db.vendas.filter(inP);
+            const m = metricas(gastos, vendas);
+
+            const kpi = (label, value, sub = '', cls = '') =>
+                `<div class="kpi"><div class="label">${label}</div><div class="value ${cls}">${value}</div><div class="sub">${sub}</div></div>`;
+            $('#kpis').innerHTML = [
+                kpi('Investido no Google Ads', brl(m.gasto), `${int(m.cliques)} cliques · CPC ${isFinite(m.cpc) ? brl(m.cpc) : '—'}`),
+                kpi('Comissão aprovada', brl(m.receita), `${int(m.vendas)} venda(s) aprovada(s)`),
+                kpi('Lucro', brl(m.lucro), 'comissão − investimento', sinal(m.lucro)),
+                kpi('ROI', pct(m.roi), `ROAS ${isFinite(m.roas) ? m.roas.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + 'x' : '—'}`, sinal(m.roi)),
+                kpi('Custo por venda (CPA)', isFinite(m.cpa) ? brl(m.cpa) : '—', `Conversão ${pct(m.conv)} dos cliques`),
+                kpi('Pendente', brl(m.pendente), `${m.nPendente} venda(s) · ${m.reembolsos} reembolso(s)`),
+            ].join('');
+
+            // tabela por produto
+            const prods = db.produtos.filter(p => !pid || p.id === pid);
+            $('#tbResumo').innerHTML = prods.length ? prods.map(p => {
+                const pm = metricas(gastos.filter(g => g.produtoId === p.id), vendas.filter(v => v.produtoId === p.id));
+                return `<tr>
+                    <td><b>${esc(p.nome)}</b></td>
+                    <td><span class="tag ${statusProdTag[p.status] || 'neutral'}">${esc(p.status)}</span></td>
+                    <td class="num">${brl(pm.gasto)}</td>
+                    <td class="num">${int(pm.cliques)}</td>
+                    <td class="num">${pct(pm.ctr)}</td>
+                    <td class="num">${isFinite(pm.cpc) ? brl(pm.cpc) : '—'}</td>
+                    <td class="num">${int(pm.vendas)}</td>
+                    <td class="num">${brl(pm.receita)}</td>
+                    <td class="num ${sinal(pm.lucro)}">${brl(pm.lucro)}</td>
+                    <td class="num ${sinal(pm.roi)}">${pct(pm.roi)}</td>
+                    <td class="num">${isFinite(pm.cpa) ? brl(pm.cpa) : '—'}</td>
+                    <td>${leitura(pm, p)}</td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="12" class="empty">Nenhum produto ainda. Comece pela aba "Produtos".</td></tr>';
+            $('#tfResumo').innerHTML = prods.length > 1 ? `<tr>
+                <td>Total</td><td></td>
+                <td class="num">${brl(m.gasto)}</td><td class="num">${int(m.cliques)}</td>
+                <td class="num">${pct(m.ctr)}</td><td class="num">${isFinite(m.cpc) ? brl(m.cpc) : '—'}</td>
+                <td class="num">${int(m.vendas)}</td><td class="num">${brl(m.receita)}</td>
+                <td class="num ${sinal(m.lucro)}">${brl(m.lucro)}</td><td class="num ${sinal(m.roi)}">${pct(m.roi)}</td>
+                <td class="num">${isFinite(m.cpa) ? brl(m.cpa) : '—'}</td><td></td></tr>` : '';
+
+            renderChart(gastos, vendas, de, ate);
+        }
+
+        // ---------- Gráfico (SVG puro) ----------
+        function renderChart(gastos, vendas, de, ate) {
+            const svg = $('#chart');
+            const box = $('#chartBox');
+            const W = box.clientWidth || 600, H = 260;
+            const pad = { l: 64, r: 12, t: 12, b: 28 };
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+            const porDia = {};
+            const add = (d, k, v) => { (porDia[d] = porDia[d] || { g: 0, r: 0 })[k] += v; };
+            gastos.forEach(g => add(g.data, 'g', g.gasto));
+            vendas.filter(v => v.status === 'Aprovada').forEach(v => add(v.data, 'r', v.valor));
+
+            const datas = Object.keys(porDia).sort();
+            if (!datas.length) {
+                svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="var(--muted)" font-size="13">Sem lançamentos no período</text>`;
+                return;
+            }
+            // preenche dias vazios entre o primeiro e o último
+            const ini = datas[0], fim = datas[datas.length - 1];
+            const dias = [];
+            for (let d = new Date(ini + 'T12:00'); d <= new Date(fim + 'T12:00'); d.setDate(d.getDate() + 1)) {
+                dias.push(isoLocal(d));
+                if (dias.length > 800) break;
+            }
+            const pts = dias.map(d => ({ d, g: (porDia[d] || {}).g || 0, r: (porDia[d] || {}).r || 0 }));
+            const max = Math.max(1, ...pts.map(p => Math.max(p.g, p.r))) * 1.1;
+
+            const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+            const x = i => pad.l + (pts.length === 1 ? iw / 2 : (i / (pts.length - 1)) * iw);
+            const y = v => pad.t + ih - (v / max) * ih;
+
+            let out = '';
+            // grade + eixo y
+            for (let i = 0; i <= 4; i++) {
+                const v = (max / 4) * i, yy = y(v);
+                out += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${yy}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
+                out += `<text x="${pad.l - 8}" y="${yy + 4}" text-anchor="end" fill="var(--muted)" font-size="11">${brl(v).replace(',00', '')}</text>`;
+            }
+            // eixo x (até ~6 rótulos)
+            const passo = Math.max(1, Math.ceil(pts.length / 6));
+            pts.forEach((p, i) => {
+                if ((i % passo === 0 && pts.length - 1 - i >= passo / 2) || i === pts.length - 1) {
+                    out += `<text x="${x(i)}" y="${H - 8}" text-anchor="${i === pts.length - 1 && pts.length > 1 ? 'end' : i === 0 && pts.length > 1 ? 'start' : 'middle'}" fill="var(--muted)" font-size="11">${fmtData(p.d).slice(0, 5)}</text>`;
+                }
+            });
+            const linha = (k, cor) => {
+                const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[k]).toFixed(1)}`).join('');
+                let s = `<path d="${d}" fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+                if (pts.length <= 31) pts.forEach((p, i) => {
+                    s += `<circle cx="${x(i)}" cy="${y(p[k])}" r="3.5" fill="${cor}" stroke="var(--surface)" stroke-width="2"/>`;
+                });
+                return s;
+            };
+            out += linha('g', 'var(--series-1)') + linha('r', 'var(--series-2)');
+            out += `<line id="cross" x1="0" x2="0" y1="${pad.t}" y2="${pad.t + ih}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>`;
+            out += `<rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent" id="hit"/>`;
+            svg.innerHTML = out;
+
+            const tip = $('#tooltip'), cross = $('#cross');
+            const hit = $('#hit');
+            const move = ev => {
+                const rect = svg.getBoundingClientRect();
+                const mx = (ev.clientX - rect.left) * (W / rect.width);
+                const i = pts.length === 1 ? 0 : Math.max(0, Math.min(pts.length - 1, Math.round(((mx - pad.l) / iw) * (pts.length - 1))));
+                const p = pts[i];
+                cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i));
+                cross.setAttribute('visibility', 'visible');
+                const lucro = p.r - p.g;
+                tip.innerHTML = `<b>${fmtData(p.d)}</b>
+                    <div class="row"><span><i style="display:inline-block;width:10px;height:3px;background:var(--series-1);vertical-align:middle;margin-right:6px"></i>Investimento</span><span>${brl(p.g)}</span></div>
+                    <div class="row"><span><i style="display:inline-block;width:10px;height:3px;background:var(--series-2);vertical-align:middle;margin-right:6px"></i>Comissão</span><span>${brl(p.r)}</span></div>
+                    <div class="row"><span>Lucro</span><span class="${sinal(lucro)}">${brl(lucro)}</span></div>`;
+                tip.style.display = 'block';
+                const px = x(i) * (rect.width / W);
+                const left = px + 12 + tip.offsetWidth > rect.width ? px - tip.offsetWidth - 12 : px + 12;
+                tip.style.left = left + 'px';
+                tip.style.top = '10px';
+            };
+            hit.addEventListener('pointermove', move);
+            hit.addEventListener('pointerdown', move);
+            hit.addEventListener('pointerleave', () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden'); });
+        }
+        let rz;
+        addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(renderGeral, 150); });
+
+        // ---------- Render: listas ----------
+        function renderProdutos() {
+            $('#tbProdutos').innerHTML = db.produtos.length ? db.produtos.map(p => {
+                const investido = db.gastos.filter(g => g.produtoId === p.id).reduce((s, g) => s + g.gasto, 0);
+                const estourou = p.orcamento && investido > p.orcamento;
+                return `<tr>
+                    <td><b>${esc(p.nome)}</b>${p.notas ? `<div style="color:var(--muted);font-size:12px;white-space:normal;max-width:260px">${esc(p.notas)}</div>` : ''}</td>
+                    <td>${esc(p.plataforma)}</td>
+                    <td>${esc(p.nicho)}</td>
+                    <td><span class="tag ${statusProdTag[p.status] || 'neutral'}">${esc(p.status)}</span></td>
+                    <td class="num">${brl(p.comissao)}</td>
+                    <td class="num">${p.orcamento ? brl(p.orcamento) : '—'}</td>
+                    <td class="num ${estourou ? 'neg' : ''}">${brl(investido)}${estourou ? ' ⚠' : ''}</td>
+                    <td>${fmtData(p.inicio)}</td>
+                    <td>${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">abrir</a>` : ''}</td>
+                    ${botoes('produtos', p.id)}
+                </tr>`;
+            }).join('') : '<tr><td colspan="10" class="empty">Nenhum produto cadastrado.</td></tr>';
+        }
+
+        function renderGastos() {
+            const lista = [...db.gastos].sort((a, b) => b.data.localeCompare(a.data));
+            $('#tbGastos').innerHTML = lista.length ? lista.map(g => `<tr>
+                <td>${fmtData(g.data)}</td>
+                <td>${esc(nomeProduto(g.produtoId))}</td>
+                <td>${esc(g.campanha)}</td>
+                <td class="num">${brl(g.gasto)}</td>
+                <td class="num">${int(g.impressoes)}</td>
+                <td class="num">${int(g.cliques)}</td>
+                <td class="num">${pct(g.impressoes ? g.cliques / g.impressoes : NaN)}</td>
+                <td class="num">${g.cliques ? brl(g.gasto / g.cliques) : '—'}</td>
+                <td class="num">${int(g.conversoes)}</td>
+                ${botoes('gastos', g.id)}
+            </tr>`).join('') : '<tr><td colspan="10" class="empty">Nenhum gasto lançado.</td></tr>';
+        }
+
+        function renderVendas() {
+            const lista = [...db.vendas].sort((a, b) => b.data.localeCompare(a.data));
+            $('#tbVendas').innerHTML = lista.length ? lista.map(v => `<tr>
+                <td>${fmtData(v.data)}</td>
+                <td>${esc(nomeProduto(v.produtoId))}</td>
+                <td class="num">${brl(v.valor)}</td>
+                <td><span class="tag ${statusVendaTag[v.status] || 'neutral'}">${esc(v.status)}</span></td>
+                <td>${esc(v.origem)}</td>
+                <td>${esc(v.transacao)}</td>
+                ${botoes('vendas', v.id)}
+            </tr>`).join('') : '<tr><td colspan="7" class="empty">Nenhuma venda registrada.</td></tr>';
+        }
+
+        function renderAll() {
+            fillProdutoSelects();
+            renderProdutos();
+            renderGastos();
+            renderVendas();
+            renderGeral();
+        }
+
+        // ---------- Backup / CSV ----------
+        function baixar(nome, conteudo, tipo) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
+            a.download = nome;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+        $('#btnExport').addEventListener('click', () => {
+            baixar(`painel-afiliado-${hoje()}.json`, JSON.stringify(db, null, 2), 'application/json');
+        });
+        $('#btnImport').addEventListener('click', () => $('#fileImport').click());
+        $('#fileImport').addEventListener('change', async e => {
+            const f = e.target.files[0];
+            if (!f) return;
+            try {
+                const d = JSON.parse(await f.text());
+                if (!Array.isArray(d.produtos)) throw 0;
+                if (!confirm('Restaurar este backup? Os dados atuais serão substituídos.')) return;
+                db = { produtos: d.produtos, gastos: d.gastos || [], vendas: d.vendas || [] };
+                save();
+                renderAll();
+                toast('Backup restaurado!');
+            } catch (err) {
+                toast('Arquivo de backup inválido.');
+            } finally {
+                e.target.value = '';
+            }
+        });
+        $('#btnCsv').addEventListener('click', () => {
+            const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+            const linhas = [['Data', 'Produto', 'Comissão', 'Status', 'Origem', 'Transação'].join(';')];
+            db.vendas.forEach(v => linhas.push([fmtData(v.data), q(nomeProduto(v.produtoId)),
+                String(v.valor).replace('.', ','), v.status, q(v.origem), q(v.transacao)].join(';')));
+            baixar(`vendas-${hoje()}.csv`, '﻿' + linhas.join('\n'), 'text/csv');
+        });
+
+        // ---------- Início ----------
+        fProduto.reset();
+        fGasto.reset();
+        renderAll();
+        fVenda.reset();
+        try {
+            const tab = localStorage.getItem(KEY + '-tab');
+            if (tab) $(`nav.tabs button[data-tab="${tab}"]`)?.click();
+        } catch (e) { }
+    </script>
+</body>
+
+</html>
